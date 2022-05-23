@@ -64,6 +64,16 @@ builder.Services
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.IRC.INoticeHandler, TASagentTwitchBot.Darkanine.IRC.IRCNoticeIgnorer>();
 
+//Core Scripting
+builder.Services
+    .AddSingleton<TASagentTwitchBot.Core.Scripting.IScriptManager, TASagentTwitchBot.Core.Scripting.ScriptManager>()
+    .AddSingletonRedirect<TASagentTwitchBot.Core.Scripting.IScriptRegistrar, TASagentTwitchBot.Core.Scripting.ScriptManager>();
+
+TASagentTwitchBot.Core.Commands.ScriptedCommands.RegisterRequiredScriptingClasses();
+builder.Services
+    .AddSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig>(TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig.GetConfig())
+    .AddTASSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands>();
+
 //Core PubSub System
 builder.Services
     .AddSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
@@ -95,8 +105,7 @@ builder.Services
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
-        Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 });
 
 
@@ -181,6 +190,7 @@ app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.IRC.IrcClient>();
 app.Services.GetRequiredService<TASagentTwitchBot.Core.PubSub.PubSubClient>();
 app.Services.GetRequiredService<TASagentTwitchBot.Darkanine.ChatListener>();
+app.Services.GetRequiredService<TASagentTwitchBot.Core.Scripting.IScriptManager>();
 
 //Kick off Validators
 botTokenValidator.RunValidator();
