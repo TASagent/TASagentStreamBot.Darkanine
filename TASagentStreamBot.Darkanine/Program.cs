@@ -27,80 +27,75 @@ builder.Services.AddSignalR();
 
 //Custom Database
 builder.Services
-    .AddDbContext<TASagentTwitchBot.Darkanine.Database.DatabaseContext>();
-
-//Register custom database to be served for BaseDatabaseContext
-builder.Services
-    .AddScoped<TASagentTwitchBot.Core.Database.BaseDatabaseContext>(x => x.GetRequiredService<TASagentTwitchBot.Darkanine.Database.DatabaseContext>());
-
+    .AddTASDbContext<TASagentTwitchBot.Darkanine.Database.DatabaseContext>();
 //Core Agnostic Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Config.BotConfiguration>(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig())
-    .AddSingleton<TASagentTwitchBot.Core.ICommunication, TASagentTwitchBot.Core.CommunicationHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.View.IConsoleOutput, TASagentTwitchBot.Core.View.BasicView>()
-    .AddSingleton<TASagentTwitchBot.Core.ErrorHandler>()
-    .AddSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
-    .AddSingleton<TASagentTwitchBot.Core.IMessageAccumulator, TASagentTwitchBot.Core.MessageAccumulator>();
+    .AddTASSingleton(TASagentTwitchBot.Core.Config.BotConfiguration.GetConfig(GetDefaultConfig()))
+    .AddTASSingleton<TASagentTwitchBot.Core.CommunicationHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.View.BasicView>()
+    .AddTASSingleton<TASagentTwitchBot.Core.ErrorHandler>()
+    .AddTASSingleton<TASagentTwitchBot.Core.ApplicationManagement>()
+    .AddTASSingleton<TASagentTwitchBot.Core.MessageAccumulator>();
 
 //Custom Agnostic Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.IConfigurator, TASagentTwitchBot.Darkanine.Configurator>();
+    .AddTASSingleton<TASagentTwitchBot.Darkanine.Configurator>();
 
 
 //Core Twitch Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.API.Twitch.HelixHelper>()
-    .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBotTokenValidator, TASagentTwitchBot.Core.API.Twitch.BotTokenValidator>()
-    .AddSingleton<TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator, TASagentTwitchBot.Core.API.Twitch.BroadcasterTokenValidator>()
-    .AddSingleton<TASagentTwitchBot.Core.Database.IUserHelper, TASagentTwitchBot.Core.Database.UserHelper>();
+    .AddTASSingleton<TASagentTwitchBot.Core.API.Twitch.HelixHelper>()
+    .AddTASSingleton<TASagentTwitchBot.Core.API.Twitch.BotTokenValidator>()
+    .AddTASSingleton<TASagentTwitchBot.Core.API.Twitch.BroadcasterTokenValidator>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Database.UserHelper>();
 
 //Core Twitch Chat Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.IRC.IrcClient>()
-    .AddSingleton<TASagentTwitchBot.Core.IRC.IIRCLogger, TASagentTwitchBot.Core.IRC.IRCLogger>()
-    .AddSingleton<TASagentTwitchBot.Core.Chat.IChatMessageHandler, TASagentTwitchBot.Core.Chat.ChatMessageHandler>();
+    .AddTASSingleton<TASagentTwitchBot.Core.IRC.IrcClient>()
+    .AddTASSingleton<TASagentTwitchBot.Core.IRC.IRCLogger>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Chat.ChatMessageHandler>();
 
 //Custom Twitch Chat Systems
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.IRC.INoticeHandler, TASagentTwitchBot.Darkanine.IRC.IRCNoticeIgnorer>();
+    .AddTASSingleton<TASagentTwitchBot.Darkanine.IRC.IRCNoticeIgnorer>();
 
 //Core Scripting
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Scripting.IScriptManager, TASagentTwitchBot.Core.Scripting.ScriptManager>()
-    .AddSingletonRedirect<TASagentTwitchBot.Core.Scripting.IScriptRegistrar, TASagentTwitchBot.Core.Scripting.ScriptManager>();
+    .AddTASSingleton<TASagentTwitchBot.Core.Scripting.ScriptManager>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Scripting.ScriptHelper>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Scripting.PersistentDataManager>();
 
-TASagentTwitchBot.Core.Commands.ScriptedCommands.RegisterRequiredScriptingClasses();
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig>(TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig.GetConfig())
+    .AddTASSingleton(TASagentTwitchBot.Core.Commands.ScriptedCommands.ScriptedCommandsConfig.GetConfig())
     .AddTASSingleton<TASagentTwitchBot.Core.Commands.ScriptedCommands>();
 
 //Core PubSub System
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
-    .AddSingleton<TASagentTwitchBot.Core.PubSub.IRedemptionSystem, TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
+    .AddTASSingleton<TASagentTwitchBot.Core.PubSub.PubSubClient>()
+    .AddTASSingleton<TASagentTwitchBot.Core.PubSub.RedemptionSystem>();
 
 //Core Timer System
-builder.Services.AddSingleton<TASagentTwitchBot.Core.Timer.ITimerManager, TASagentTwitchBot.Core.Timer.TimerManager>();
+builder.Services.AddTASSingleton<TASagentTwitchBot.Core.Timer.TimerManager>();
 
 //Command System
 //Core Commands
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Commands.CommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
-    .AddSingleton<TASagentTwitchBot.Core.Commands.ICommandContainer, TASagentTwitchBot.Core.Commands.PermissionSystem>();
+    .AddTASSingleton<TASagentTwitchBot.Core.Commands.CommandSystem>()
+    .AddTASSingleton<TASagentTwitchBot.Core.Commands.SystemCommandSystem>()
+    .AddTASSingleton<TASagentTwitchBot.Darkanine.LimitedPermissionSystem>();
 
 //Core Credit System
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Core.Credit.ICreditManager, TASagentTwitchBot.Core.Credit.DisabledCreditManager>();
+    .AddTASSingleton<TASagentTwitchBot.Core.Credit.DisabledCreditManager>();
 
 
 //XInput Services
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Plugin.XInput.IButtonPressDispatcher, TASagentTwitchBot.Plugin.XInput.ButtonPressDispatcher>();
+    .AddTASSingleton<TASagentTwitchBot.Plugin.XInput.ButtonPressDispatcher>();
 
 //Custom Chat Listener
 builder.Services
-    .AddSingleton<TASagentTwitchBot.Darkanine.ChatListener>();
+    .AddTASSingleton<TASagentTwitchBot.Darkanine.ChatListener>();
 
 //Routing
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -124,6 +119,9 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseAuthorization();
 app.UseDefaultFiles();
+
+//Config overrides
+app.UseDocumentsOverrideContent();
 
 //Custom Web Assets
 app.UseStaticFiles();
@@ -182,19 +180,10 @@ communication.SendDebugMessage("*** Starting Up Application ***");
 TASagentTwitchBot.Core.ErrorHandler errorHandler = app.Services.GetRequiredService<TASagentTwitchBot.Core.ErrorHandler>();
 TASagentTwitchBot.Core.ApplicationManagement applicationManagement = app.Services.GetRequiredService<TASagentTwitchBot.Core.ApplicationManagement>();
 
-TASagentTwitchBot.Core.API.Twitch.IBotTokenValidator botTokenValidator = app.Services.GetRequiredService<TASagentTwitchBot.Core.API.Twitch.IBotTokenValidator>();
-TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator broadcasterTokenValidator = app.Services.GetRequiredService<TASagentTwitchBot.Core.API.Twitch.IBroadcasterTokenValidator>();
-
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Commands.CommandSystem>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.IMessageAccumulator>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.IRC.IrcClient>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.PubSub.PubSubClient>();
-app.Services.GetRequiredService<TASagentTwitchBot.Darkanine.ChatListener>();
-app.Services.GetRequiredService<TASagentTwitchBot.Core.Scripting.IScriptManager>();
-
-//Kick off Validators
-botTokenValidator.RunValidator();
-broadcasterTokenValidator.RunValidator();
+foreach (TASagentTwitchBot.Core.IStartupListener startupListener in app.Services.GetServices<TASagentTwitchBot.Core.IStartupListener>())
+{
+    startupListener.NotifyStartup();
+}
 
 //
 // Wait for signal to end application
@@ -214,3 +203,18 @@ catch (Exception ex)
 //
 
 await app.StopAsync();
+
+
+static TASagentTwitchBot.Core.Config.BotConfiguration GetDefaultConfig() =>
+    new TASagentTwitchBot.Core.Config.BotConfiguration()
+    {
+        Version = TASagentTwitchBot.Core.Config.BotConfiguration.CURRENT_VERSION,
+        AuthConfiguration = new TASagentTwitchBot.Core.Config.AuthConfiguration()
+        {
+            //Set admin password blank so it's prompted
+            Admin = new TASagentTwitchBot.Core.Config.CredentialSet() { PasswordHash = "" },
+            //Set non-admin passwords to nonsense, since they aren't required
+            Privileged = new TASagentTwitchBot.Core.Config.CredentialSet() { PasswordHash = TASagentTwitchBot.Core.Cryptography.HashPassword(Guid.NewGuid().ToString()) },
+            User = new TASagentTwitchBot.Core.Config.CredentialSet() { PasswordHash = TASagentTwitchBot.Core.Cryptography.HashPassword(Guid.NewGuid().ToString()) }
+        }
+    };
